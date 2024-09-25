@@ -159,18 +159,18 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
 col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
 with col1:
     st.header("¬◇ | Not Diamond Routing Quickstart")
-    caption = f"Use this application to explore how Not Diamond routes your prompts. Not Diamond will route to the best model for each query, while using cheaper models for simple questions."
+    caption = f"Use this application to explore how Not Diamond routes your prompts. Not Diamond will route to the best model for each query using the tradeoffs you specify."
     st.caption(caption)
 
-ND_TRADEOFF = "cost"
+ND_TRADEOFF = "quality"
 with col2:
-    ND_TRADEOFF = st.selectbox("Choose a routing tradeoff [default: cost]", ["cost", "latency", "quality"], placeholder="Choose a tradeoff")
+    ND_TRADEOFF = st.selectbox("Choose a routing tradeoff [default: quality]", ["quality", "cost", "latency"], placeholder="Choose a tradeoff")
     if ND_TRADEOFF == "quality":
         ND_TRADEOFF = None
 
 providers_to_use = {}
 with col3:
-    with st.expander("Not sure which models to use? Choose some defaults below:"):
+    with st.expander("Choose which models to route between, or leave blank to route to all of them:"):
         for provider in DEFAULT_LLM_CONFIGS:
             provider_str = str(provider)
             providers_to_use[provider_str] = st.checkbox(provider_str)
@@ -221,23 +221,21 @@ with st.container():
                         for provider in providers_to_use
                         if providers_to_use[provider]
                     ]
-                    answer = stream_search(question, nd_client, llm_configs)
+                    model, answer, response_cost, savings = search(question, nd_client, llm_configs)
 
-                    with st.container():
-                        try:
-                            st.write_stream(_write_stream(answer))
-                            routed_model = state.chosen_model
-                        except openai.BadRequestError as e:
-                            print("Could not call OpenAI with streamed response - probably for an o1 model. Falling back to non-streaming response.")
-                            routed_model, answer = search(question, nd_client, llm_configs)
-                            st.markdown(answer)
-                        if routed_model == "gpt-4o-mini-2024-07-18":
-                            routed_to = f"""
-                            Routing target (simple query detected): _{routed_model}_
-                            """
-                        else:
-                            routed_to = f"Routing target: _{routed_model}_"
-                        if 'o1' in routed_model:
-                            st.warning(routed_to + "\n\n(o1 models do not support streaming)", icon="⚠️")
-                        else:
-                            st.success(routed_to, icon="💠")
+                response_cost_dollars = response_cost / 100000
+                savings_dollars = savings / 100000
+                total_savings_1000_queries = savings_dollars * 100000
+
+                with st.container():
+                    col1, col2 = st.columns([0.5, 0.5])
+                    with col1:
+                        routed_to = f"Routing target: _{model}_"
+                        st.success(routed_to, icon="💠")
+                    with col2:
+                        cost_str = f"""
+                        Cost of response: \${response_cost_dollars}
+                        """
+                        st.info(cost_str, icon="💰")
+
+                st.markdown(answer)
