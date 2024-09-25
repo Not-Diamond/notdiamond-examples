@@ -1,7 +1,7 @@
 import logging
 import os
 import sys
-from typing import List, Any
+from typing import List, Any, Tuple
 
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
@@ -103,7 +103,7 @@ def get_cost(messages: List[str], output: str, model: str) -> int:
     input_length = sum(len(msg) for msg in messages)
     output_length = len(output)
 
-    provider_costs = PROVIDER_TO_COST.get(model)
+    provider_costs = PROVIDER_TO_COST.get(model, PROVIDER_TO_COST.get(model.split("/")[-1]))
     if not provider_costs:
         _LOGGER.error(f"Provider not found for model: {model}")
         return 0
@@ -123,7 +123,7 @@ def _get_nd_user_agent(client: NotDiamond) -> None:
     user_agent_str = "/".join(user_agent_elems[:-1] + ['streamlit'] + user_agent_elems[-1:])
     client.user_agent = user_agent_str
 
-def stream_search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Any:
+def stream_search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Tuple[str, Any]:
     _LOGGER.info(f"Question: {question}")
 
     if not llm_configs:
@@ -132,12 +132,14 @@ def stream_search(question: str, client: NotDiamond, llm_configs: List[str] = No
 
     client.llm_configs = llm_configs
     nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client, temperature=1.0, nd_kwargs={'tradeoff': ND_TRADEOFF})
+    # For streaming we call model_select and stream separately
+    model = nd_routed_runnable._ndrunnable._model_select(question)
     chain = prompt_template | nd_routed_runnable
     result = chain.stream({"question": question})
 
-    return result
+    return model, result
 
-def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Any:
+def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Tuple[str, Any]:
     _LOGGER.info(f"Question: {question}")
 
     if not llm_configs:
@@ -159,18 +161,18 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
 col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
 with col1:
     st.header("¬◇ | Not Diamond Routing Quickstart")
-    caption = f"Use this application to explore how Not Diamond routes your prompts. Not Diamond will route to the best model for each query, while using cheaper models for simple questions."
+    caption = f"Use this application to explore how Not Diamond routes your prompts. Not Diamond will route to the best model for each query using the tradeoffs you specify."
     st.caption(caption)
 
-ND_TRADEOFF = "cost"
+ND_TRADEOFF = "quality"
 with col2:
-    ND_TRADEOFF = st.selectbox("Choose a routing tradeoff [default: cost]", ["cost", "latency", "quality"], placeholder="Choose a tradeoff")
+    ND_TRADEOFF = st.selectbox(f"Choose a routing tradeoff [default: {ND_TRADEOFF}]", ["quality", "cost", "latency"], placeholder="Choose a tradeoff")
     if ND_TRADEOFF == "quality":
         ND_TRADEOFF = None
 
 providers_to_use = {}
 with col3:
-    with st.expander("Not sure which models to use? Choose some defaults below:"):
+    with st.expander("Choose which models to route between, or leave blank to route to all of them:"):
         for provider in DEFAULT_LLM_CONFIGS:
             provider_str = str(provider)
             providers_to_use[provider_str] = st.checkbox(provider_str)
@@ -179,14 +181,12 @@ if 'nd_api_key' not in state:
     state.nd_api_key = os.getenv("NOTDIAMOND_API_KEY")
 
 def _write_stream(answer):
+    response_contents = []
     for chunk in answer:
-        yield chunk.content
-    if 'model' in chunk.response_metadata:
-        state.chosen_model = chunk.response_metadata['model']
-    elif 'model_name' in chunk.response_metadata:
-        state.chosen_model = chunk.response_metadata['model_name']
-    else:
-        print(chunk.response_metadata)
+        content = chunk.content
+        response_contents.append(content)
+        yield content
+    state.response_content = ''.join(response_contents)
 
 with st.container():
     if not state.nd_api_key or state.nd_api_key == "" or state.nd_api_key is None:
@@ -221,23 +221,24 @@ with st.container():
                         for provider in providers_to_use
                         if providers_to_use[provider]
                     ]
-                    answer = stream_search(question, nd_client, llm_configs)
+                    routed_model, answer = stream_search(question, nd_client, llm_configs)
 
                     with st.container():
+                        routed_to = "Routing target: "
+                        if routed_model == "gpt-4o-mini-2024-07-18":
+                            routed_to += f" (simple query detected)"
+                        routed_to += f" _{routed_model}_"
+                        st.success(routed_to, icon="💠")
+
                         try:
                             st.write_stream(_write_stream(answer))
-                            routed_model = state.chosen_model
                         except openai.BadRequestError as e:
                             print("Could not call OpenAI with streamed response - probably for an o1 model. Falling back to non-streaming response.")
                             routed_model, answer = search(question, nd_client, llm_configs)
+                            state.response_content = answer
                             st.markdown(answer)
-                        if routed_model == "gpt-4o-mini-2024-07-18":
-                            routed_to = f"""
-                            Routing target (simple query detected): _{routed_model}_
-                            """
-                        else:
-                            routed_to = f"Routing target: _{routed_model}_"
+
+                        cost_str = f"Response cost: \${get_cost(question, state.response_content, routed_model) / 100000:.4f}"
                         if 'o1' in routed_model:
-                            st.warning(routed_to + "\n\n(o1 models do not support streaming)", icon="⚠️")
-                        else:
-                            st.success(routed_to, icon="💠")
+                            cost_str += f"\n\n(o1 models do not support streaming)"
+                        st.info(cost_str, icon='ℹ️')
