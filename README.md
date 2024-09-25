@@ -13,8 +13,10 @@ Install the dependencies:
 poetry install
 ```
 
+## Exploring Not Diamond
+
 Create a `.env` file from the included template, then run the app
 
 ```shell
-streamlit run main.py
+streamlit run notdiamond_examples/streamlit/main.py
 ```
