@@ -30,7 +30,7 @@ model supported by Not Diamond][supported].
 Want to test out image generation? Watch the most popular models battle in Arena Mode? [Chat with Not Diamond].
 
 <p align="center">
-  <img src="./chat_nd.png" alt="Arena Mode in Chat" width="80%">
+  <img src="./chat_nd.png" alt="Arena Mode in Chat">
 </p>
 
 ## Support
