@@ -62,6 +62,16 @@ PROVIDER_TO_COST = {
         "output": 12,
         "max_tokens": 128_000
     },
+    "Meta-Llama-3.1-405B-Instruct-Turbo": {
+        "input": 5,
+        "output": 5,
+        "max_tokens": 128_000
+    },
+    "mistral-large-2407": {
+        "input": 2,
+        "output": 6,
+        "max_tokens": 128_000
+    }
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,6 +84,7 @@ DEFAULT_LLM_CONFIGS = [
     LLMConfig.from_string("anthropic/claude-3-5-sonnet-20240620"),
     LLMConfig.from_string("openai/o1-preview-2024-09-12"),
     LLMConfig.from_string("openai/o1-mini-2024-09-12"),
+    LLMConfig.from_string("mistral/mistral-large-2407"),
     # "google/gemini-1.5-pro-latest",
 ]
 
@@ -138,14 +149,20 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
 
     return routed_model, result.content, response_cost, savings
 
-col1, col2 = st.columns([0.7, 0.3])
+col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
 with col1:
     st.header("¬◇ | Not Diamond Routing Quickstart")
     caption = f"Use this application to explore how Not Diamond routes your prompts. Not Diamond will route to the best model for each query, while using cheaper models for simple questions."
     st.caption(caption)
 
-providers_to_use = {}
+ND_TRADEOFF = "cost"
 with col2:
+    ND_TRADEOFF = st.selectbox("Choose a routing tradeoff [default: cost]", ["cost", "latency", "quality"], placeholder="Choose a tradeoff")
+    if ND_TRADEOFF == "quality":
+        ND_TRADEOFF = None
+
+providers_to_use = {}
+with col3:
     with st.expander("Not sure which models to use? Choose some defaults below:"):
         for provider in DEFAULT_LLM_CONFIGS:
             provider_str = str(provider)
@@ -171,7 +188,7 @@ with st.container():
     elif state.nd_api_key:
         nd_client = NotDiamond(
             api_key=state.nd_api_key,
-            tradeoff="cost",
+            tradeoff=ND_TRADEOFF,
             nd_api_url=NOTDIAMOND_API_URL,
         )
         _get_nd_user_agent(nd_client)
