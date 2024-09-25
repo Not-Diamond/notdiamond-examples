@@ -1555,13 +1555,13 @@ requests = ">=2,<3"
 
 [[package]]
 name = "langsmith"
-version = "0.1.127"
+version = "0.1.128"
 description = "Client library to connect to the LangSmith LLM Tracing and Evaluation Platform."
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langsmith-0.1.127-py3-none-any.whl", hash = "sha256:b4e8058d16ee0c814b16fae135c1e8817d1f43a38462d7f55e0eb1f87b9526aa"},
-    {file = "langsmith-0.1.127.tar.gz", hash = "sha256:19c6f95d5558180c600455781e6faacc7798d0e1c54d6eb50ffb744d56f02bc9"},
+    {file = "langsmith-0.1.128-py3-none-any.whl", hash = "sha256:c1b59d947584be7487ac53dffb4e232704626964011b714fd3d9add4b3694cbc"},
+    {file = "langsmith-0.1.128.tar.gz", hash = "sha256:3299e17a659f3c47725c97c47f4445fc34113ac668becce425919866fbcb6ec2"},
 ]
 
 [package.dependencies]
@@ -1857,13 +1857,13 @@ pyarrow = ["pyarrow (>=11.0.0)"]
 
 [[package]]
 name = "notdiamond"
-version = "0.3.13"
+version = "0.3.14"
 description = "Not Diamond Python SDK"
 optional = false
 python-versions = "<3.13,>=3.10"
 files = [
-    {file = "notdiamond-0.3.13-py3-none-any.whl", hash = "sha256:0c663227397f54447100dabc8824e3d79ddc2029e0a67257a2b730df074df754"},
-    {file = "notdiamond-0.3.13.tar.gz", hash = "sha256:39e10062df65fd41a0bc8c312e3f441625ba804d79300a915ec9f60fd55fea84"},
+    {file = "notdiamond-0.3.14-py3-none-any.whl", hash = "sha256:c9984d6a570b69a5a53a6fe79b02226e5dd73355355b05ca0be22a54566cadc9"},
+    {file = "notdiamond-0.3.14.tar.gz", hash = "sha256:21b11f3ef1ad1f52f920bbae32066d52d414ccbf1ea54f97a8f73727cc364477"},
 ]
 
 [package.dependencies]
@@ -3580,4 +3580,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "7b6374d2f01522da520985a5e9a394dfb59171b9bf8fc2fa6e8a950b0b94b1ce"
+content-hash = "94f22249a6d46e46ebecfbf7b6127d81b8991c87d21cb90cbda5aa4a6622176a"

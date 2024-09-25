@@ -36,47 +36,46 @@ st.markdown("""
        }
 </style>""", unsafe_allow_html=True)
 
-ndLLMProviders = [
-    {
-        "ndProvider": "openai",
-        "cloudProvider": "openai",
-        "ndModelId": "gpt-4o",
-        "providerModelId": "gpt-4o",
-        "label": "GPT-4o",
-        "inputCost": 5,
-        "outputCost": 15,
-        "maxTokens": 128_000
+PROVIDER_TO_COST = {
+    "gpt-4o-2024-05-13": {
+        "input": 5,
+        "output": 15,
+        "max_tokens": 128_000
     },
-    {
-        "ndProvider": "openai",
-        "cloudProvider": "openai",
-        "ndModelId": "gpt-4o-mini",
-        "providerModelId": "gpt-4o-mini",
-        "label": "GPT-4o Mini",
-        "inputCost": 0.15,
-        "outputCost": 0.6,
-        "maxTokens": 128_000
+    "gpt-4o-mini-2024-07-18": {
+        "input": 0.15,
+        "output": 0.6,
+        "max_tokens": 128_000
     },
-    {
-        "ndProvider": "anthropic",
-        "cloudProvider": "anthropic",
-        "ndModelId": "claude-3-5-sonnet-20240620",
-        "providerModelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
-        "label": "Claude 3.5 Sonnet",
-        "inputCost": 3,
-        "outputCost": 15
+    "claude-3-5-sonnet-20240620": {
+        "input": 3,
+        "output": 15,
+        "max_tokens": 200_000
     },
-]
+    "o1-preview-2024-09-12": {
+        "input": 15,
+        "output": 60,
+        "max_tokens": 128_000
+    },
+    "o1-mini-2024-09-12": {
+        "input": 3,
+        "output": 12,
+        "max_tokens": 128_000
+    },
+}
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.INFO)
 _LOGGER.addHandler(logging.StreamHandler(sys.stdout))
 
-model_id_to_label = {
-    "gpt-4o-mini-2024-07-18": "gpt-4o-mini",
-    "gpt-4o-2024-05-13": "gpt-4o",
-    "claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0"
-}
+DEFAULT_LLM_CONFIGS = [
+    LLMConfig.from_string("openai/gpt-4o-2024-05-13"),
+    LLMConfig.from_string("openai/gpt-4o-mini-2024-07-18"),
+    LLMConfig.from_string("anthropic/claude-3-5-sonnet-20240620"),
+    LLMConfig.from_string("openai/o1-preview-2024-09-12"),
+    LLMConfig.from_string("openai/o1-mini-2024-09-12"),
+    # "google/gemini-1.5-pro-latest",
+]
 
 def get_cost(messages: List[str], output: str, model: str) -> int:
     """
@@ -90,22 +89,16 @@ def get_cost(messages: List[str], output: str, model: str) -> int:
     input_length = sum(len(msg) for msg in messages)
     output_length = len(output)
 
-    # Map the model ID to the corresponding label
-    model_label = model_id_to_label.get(model)
-    if not model_label:
-        _LOGGER.error(f"Model not found: {model}")
-        return 0
-
-    provider = next((item for item in ndLLMProviders if item["providerModelId"] == model_label), None)
-    if not provider:
-        _LOGGER.error(f"Provider not found for model: {model_label}")
+    provider_costs = PROVIDER_TO_COST.get(model)
+    if not provider_costs:
+        _LOGGER.error(f"Provider not found for model: {model}")
         return 0
 
     input_tokens = input_length * 1.33
     output_tokens = output_length * 1.33
 
-    input_cost = (input_tokens / 1_000_000) * provider["inputCost"]
-    output_cost = (output_tokens / 1_000_000) * provider["outputCost"]
+    input_cost = (input_tokens / 1_000_000) * provider_costs["input"]
+    output_cost = (output_tokens / 1_000_000) * provider_costs["output"]
 
     total_cost = input_cost + output_cost
     cost_in_hundredth_cents = round(total_cost * 1000000)
@@ -121,20 +114,13 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
     _LOGGER.info(f"Question: {question}")
 
     if not llm_configs:
-        llm_configs = [
-            LLMConfig.from_string("openai/gpt-4o"),
-            LLMConfig.from_string("openai/gpt-4o-mini"),
-            LLMConfig.from_string("anthropic/claude-3-5-sonnet-20240620"),
-            # "google/gemini-1.5-pro-latest",
-        ]
-
+        llm_configs = DEFAULT_LLM_CONFIGS
     prompt_template = PromptTemplate.from_template("{question}")
 
     client.llm_configs = llm_configs
-    nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client)
+    nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client, temperature=1.0)
     chain = prompt_template | nd_routed_runnable
     result = chain.invoke({"question": question})
-    print(result.content)
 
     # Calculate costs
     messages = [question]
@@ -161,15 +147,15 @@ with col1:
 providers_to_use = {}
 with col2:
     with st.expander("Choose your models below:"):
-        for provider in ndLLMProviders:
-            provider_str = f"{provider['ndProvider']}/{provider['ndModelId']}"
+        for provider in DEFAULT_LLM_CONFIGS:
+            provider_str = str(provider)
             providers_to_use[provider_str] = st.checkbox(provider_str)
 
 if 'nd_api_key' not in state:
     state.nd_api_key = os.getenv("NOTDIAMOND_API_KEY")
 
 with st.container():
-    if not state.nd_api_key:
+    if not state.nd_api_key or state.nd_api_key == "" or state.nd_api_key is None:
 
         def _set_api_key():
             os.environ["NOTDIAMOND_API_KEY"] = state.nd_api_key_input
