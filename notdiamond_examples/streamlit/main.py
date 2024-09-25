@@ -129,7 +129,7 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
     prompt_template = PromptTemplate.from_template("{question}")
 
     client.llm_configs = llm_configs
-    nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client, temperature=1.0)
+    nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client, temperature=1.0, nd_kwargs={'tradeoff': ND_TRADEOFF})
     chain = prompt_template | nd_routed_runnable
     result = chain.invoke({"question": question})
 

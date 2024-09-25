@@ -1857,13 +1857,13 @@ pyarrow = ["pyarrow (>=11.0.0)"]
 
 [[package]]
 name = "notdiamond"
-version = "0.3.14"
+version = "0.3.15"
 description = "Not Diamond Python SDK"
 optional = false
 python-versions = "<3.13,>=3.10"
 files = [
-    {file = "notdiamond-0.3.14-py3-none-any.whl", hash = "sha256:c9984d6a570b69a5a53a6fe79b02226e5dd73355355b05ca0be22a54566cadc9"},
-    {file = "notdiamond-0.3.14.tar.gz", hash = "sha256:21b11f3ef1ad1f52f920bbae32066d52d414ccbf1ea54f97a8f73727cc364477"},
+    {file = "notdiamond-0.3.15-py3-none-any.whl", hash = "sha256:2a20aef970f87aba05d03099568a87321f85f713ddb51c0b221638a0f0e3f971"},
+    {file = "notdiamond-0.3.15.tar.gz", hash = "sha256:4cb412b97ccfbed9306fc3b939f561eec364199f0106b9e94f672a31f2622088"},
 ]
 
 [package.dependencies]
