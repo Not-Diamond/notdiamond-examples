@@ -4,7 +4,7 @@
 
 ```shell
 pyenv virtualenv 3.11 notdiamond-examples
-pip install notdiamond-examples
+pyenv activate notdiamond-examples
 ```
 
 Install the dependencies:
