@@ -1,13 +1,14 @@
 import logging
 import os
 import sys
-from typing import List, Tuple
+from typing import List, Any
 
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from notdiamond import NotDiamond, LLMConfig
 from notdiamond.settings import NOTDIAMOND_API_URL
 from notdiamond.toolkit.langchain import NotDiamondRoutedRunnable
+import openai
 
 import streamlit as st
 from streamlit import session_state as state
@@ -35,6 +36,8 @@ st.markdown("""
        overflow-anchor: none !important;
        }
 </style>""", unsafe_allow_html=True)
+
+st.logo("notdiamond_examples/streamlit/icon.png")
 
 PROVIDER_TO_COST = {
     "gpt-4o-2024-05-13": {
@@ -120,8 +123,21 @@ def _get_nd_user_agent(client: NotDiamond) -> None:
     user_agent_str = "/".join(user_agent_elems[:-1] + ['streamlit'] + user_agent_elems[-1:])
     client.user_agent = user_agent_str
 
+def stream_search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Any:
+    _LOGGER.info(f"Question: {question}")
 
-def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Tuple[str, str]:
+    if not llm_configs:
+        llm_configs = DEFAULT_LLM_CONFIGS
+    prompt_template = PromptTemplate.from_template("{question}")
+
+    client.llm_configs = llm_configs
+    nd_routed_runnable = NotDiamondRoutedRunnable(nd_client=client, temperature=1.0, nd_kwargs={'tradeoff': ND_TRADEOFF})
+    chain = prompt_template | nd_routed_runnable
+    result = chain.stream({"question": question})
+
+    return result
+
+def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> Any:
     _LOGGER.info(f"Question: {question}")
 
     if not llm_configs:
@@ -133,21 +149,12 @@ def search(question: str, client: NotDiamond, llm_configs: List[str] = None) -> 
     chain = prompt_template | nd_routed_runnable
     result = chain.invoke({"question": question})
 
-    # Calculate costs
-    messages = [question]
-    output = result.content
     try:
-        routed_model = result.response_metadata.get('model')
-        if not routed_model:
-            routed_model = result.response_metadata.get('model_name')
-    except KeyError as kerr:
-        print(result.response_metadata)
-        raise kerr
-    response_cost = get_cost(messages, output, routed_model)
-    gpt4o_cost = get_cost(messages, output, "gpt-4o-2024-05-13")  # Use the mapped model ID
-    savings = gpt4o_cost - response_cost
+        model = result.response_metadata['model']
+    except KeyError:
+        model = result.response_metadata['model_name']
 
-    return routed_model, result.content, response_cost, savings
+    return model, result.content
 
 col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
 with col1:
@@ -170,6 +177,16 @@ with col3:
 
 if 'nd_api_key' not in state:
     state.nd_api_key = os.getenv("NOTDIAMOND_API_KEY")
+
+def _write_stream(answer):
+    for chunk in answer:
+        yield chunk.content
+    if 'model' in chunk.response_metadata:
+        state.chosen_model = chunk.response_metadata['model']
+    elif 'model_name' in chunk.response_metadata:
+        state.chosen_model = chunk.response_metadata['model_name']
+    else:
+        print(chunk.response_metadata)
 
 with st.container():
     if not state.nd_api_key or state.nd_api_key == "" or state.nd_api_key is None:
