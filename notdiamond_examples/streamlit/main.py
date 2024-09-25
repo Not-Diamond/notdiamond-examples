@@ -146,7 +146,7 @@ with col1:
 
 providers_to_use = {}
 with col2:
-    with st.expander("Choose your models below:"):
+    with st.expander("Not sure which models to use? Choose some defaults below:"):
         for provider in DEFAULT_LLM_CONFIGS:
             provider_str = str(provider)
             providers_to_use[provider_str] = st.checkbox(provider_str)

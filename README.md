@@ -15,7 +15,8 @@ poetry install
 
 ## Exploring Not Diamond
 
-Create a `.env` file from the included template, then run the app
+Create a `.env` file from the included template, making sure to populate keys for the providers
+you would like to use. Then run the app:
 
 ```shell
 streamlit run notdiamond_examples/streamlit/main.py
