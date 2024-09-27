@@ -197,6 +197,21 @@ bedrock = ["boto3 (>=1.28.57)", "botocore (>=1.31.57)"]
 vertex = ["google-auth (>=2,<3)"]
 
 [[package]]
+name = "anthropic-haystack"
+version = "1.1.0"
+description = "An integration of Anthropic Claude models into the Haystack framework."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "anthropic_haystack-1.1.0-py3-none-any.whl", hash = "sha256:3fa4323ac6cbf40ac6cb06dd162649836184dc691bd45863734c1610d47d91d0"},
+    {file = "anthropic_haystack-1.1.0.tar.gz", hash = "sha256:d4447f652430880b5d43e1c720d7c14027de194e1d450116c655bd4b3830fb08"},
+]
+
+[package.dependencies]
+anthropic = "*"
+haystack-ai = "*"
+
+[[package]]
 name = "anyio"
 version = "4.6.0"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -247,6 +262,38 @@ dev = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pre-commit", "pympler", 
 docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
 tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
+
+[[package]]
+name = "backoff"
+version = "2.2.1"
+description = "Function decoration for backoff and retry"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "backoff-2.2.1-py3-none-any.whl", hash = "sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8"},
+    {file = "backoff-2.2.1.tar.gz", hash = "sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba"},
+]
+
+[[package]]
+name = "beautifulsoup4"
+version = "4.12.3"
+description = "Screen-scraping library"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed"},
+    {file = "beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"},
+]
+
+[package.dependencies]
+soupsieve = ">1.2"
+
+[package.extras]
+cchardet = ["cchardet"]
+chardet = ["chardet"]
+charset-normalizer = ["charset-normalizer"]
+html5lib = ["html5lib"]
+lxml = ["lxml"]
 
 [[package]]
 name = "blinker"
@@ -1053,6 +1100,48 @@ files = [
 ]
 
 [[package]]
+name = "haystack-ai"
+version = "2.5.1"
+description = "LLM framework to build customizable, production-ready LLM applications. Connect components (models, vector DBs, file converters) to pipelines or agents that can interact with your data."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "haystack_ai-2.5.1-py3-none-any.whl", hash = "sha256:279a5719d614c37c917a4283dd6d8245c9a516e5579223d3c280772b0c8da45e"},
+    {file = "haystack_ai-2.5.1.tar.gz", hash = "sha256:3887b59f4ed5b678520d4242ada67bf00178f4c750c96c6fd09476d450e7543d"},
+]
+
+[package.dependencies]
+haystack-experimental = "*"
+jinja2 = "*"
+lazy-imports = "*"
+more-itertools = "*"
+networkx = "*"
+numpy = "<2"
+openai = ">=1.1.0"
+pandas = "*"
+posthog = "*"
+python-dateutil = "*"
+pyyaml = "*"
+requests = "*"
+tenacity = "!=8.4.0"
+tqdm = "*"
+typing-extensions = ">=4.7"
+
+[[package]]
+name = "haystack-experimental"
+version = "0.2.0"
+description = "Experimental components and features for the Haystack LLM framework."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "haystack_experimental-0.2.0-py3-none-any.whl", hash = "sha256:a4601d12d824a6fc2f4f6fb3583376f01aba9207c92e0d6a7d4e4f358a8964aa"},
+    {file = "haystack_experimental-0.2.0.tar.gz", hash = "sha256:393c543f29c50ea21365f5d032cd8b6bca10256016a3791546f1acc7ac623b07"},
+]
+
+[package.dependencies]
+haystack-ai = "*"
+
+[[package]]
 name = "httpcore"
 version = "1.0.5"
 description = "A minimal low-level HTTP client."
@@ -1554,6 +1643,20 @@ langchain-openai = ">=0.1.16,<0.2.0"
 requests = ">=2,<3"
 
 [[package]]
+name = "langdetect"
+version = "1.0.9"
+description = "Language detection library ported from Google's language-detection."
+optional = false
+python-versions = "*"
+files = [
+    {file = "langdetect-1.0.9-py2-none-any.whl", hash = "sha256:7cbc0746252f19e76f77c0b1690aadf01963be835ef0cd4b56dddf2a8f1dfc2a"},
+    {file = "langdetect-1.0.9.tar.gz", hash = "sha256:cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0"},
+]
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "langsmith"
 version = "0.1.128"
 description = "Client library to connect to the LangSmith LLM Tracing and Evaluation Platform."
@@ -1569,6 +1672,22 @@ httpx = ">=0.23.0,<1"
 orjson = ">=3.9.14,<4.0.0"
 pydantic = {version = ">=1,<3", markers = "python_full_version < \"3.12.4\""}
 requests = ">=2,<3"
+
+[[package]]
+name = "lazy-imports"
+version = "0.3.1"
+description = "Tool to support lazy imports"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "lazy_imports-0.3.1-py3-none-any.whl", hash = "sha256:149500cb1015726f5148155989386b30b425dfd7e48fd156385eb1c9e23887dd"},
+    {file = "lazy_imports-0.3.1.tar.gz", hash = "sha256:636624104bf45b09761323e06292927832aca067c3c199e5de483738789aeb21"},
+]
+
+[package.extras]
+all = ["black", "flake8", "isort", "mdformat", "mypy", "packaging", "pydocstyle", "pylint", "pylintfileheader", "pytest"]
+checking = ["black", "flake8", "isort", "mdformat", "mypy", "pydocstyle", "pylint", "pylintfileheader"]
+testing = ["packaging", "pytest"]
 
 [[package]]
 name = "litellm"
@@ -1722,6 +1841,28 @@ files = [
 ]
 
 [[package]]
+name = "monotonic"
+version = "1.6"
+description = "An implementation of time.monotonic() for Python 2 & < 3.3"
+optional = false
+python-versions = "*"
+files = [
+    {file = "monotonic-1.6-py2.py3-none-any.whl", hash = "sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c"},
+    {file = "monotonic-1.6.tar.gz", hash = "sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7"},
+]
+
+[[package]]
+name = "more-itertools"
+version = "10.5.0"
+description = "More routines for operating on iterables, beyond itertools"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "more-itertools-10.5.0.tar.gz", hash = "sha256:5482bfef7849c25dc3c6dd53a6173ae4795da2a41a80faea6700d9f5846c5da6"},
+    {file = "more_itertools-10.5.0-py3-none-any.whl", hash = "sha256:037b0d3203ce90cca8ab1defbbdac29d5f993fc20131f3664dc8d6acfa872aef"},
+]
+
+[[package]]
 name = "multidict"
 version = "6.1.0"
 description = "multidict implementation"
@@ -1854,6 +1995,24 @@ modin = ["modin"]
 pandas = ["pandas (>=0.25.3)"]
 polars = ["polars (>=0.20.3)"]
 pyarrow = ["pyarrow (>=11.0.0)"]
+
+[[package]]
+name = "networkx"
+version = "3.3"
+description = "Python package for creating and manipulating graphs and networks"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "networkx-3.3-py3-none-any.whl", hash = "sha256:28575580c6ebdaf4505b22c6256a2b9de86b316dc63ba9e93abde3d78dfdbcf2"},
+    {file = "networkx-3.3.tar.gz", hash = "sha256:0c127d8b2f4865f59ae9cb8aafcd60b5c70f3241ebd66f7defad7c4ab90126c9"},
+]
+
+[package.extras]
+default = ["matplotlib (>=3.6)", "numpy (>=1.23)", "pandas (>=1.4)", "scipy (>=1.9,!=1.11.0,!=1.11.1)"]
+developer = ["changelist (==0.5)", "mypy (>=1.1)", "pre-commit (>=3.2)", "rtoml"]
+doc = ["myst-nb (>=1.0)", "numpydoc (>=1.7)", "pillow (>=9.4)", "pydata-sphinx-theme (>=0.14)", "sphinx (>=7)", "sphinx-gallery (>=0.14)", "texext (>=0.6.7)"]
+extra = ["lxml (>=4.6)", "pydot (>=2.0)", "pygraphviz (>=1.12)", "sympy (>=1.10)"]
+test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
 name = "notdiamond"
@@ -2226,6 +2385,29 @@ mic = ["olefile"]
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 typing = ["typing-extensions"]
 xmp = ["defusedxml"]
+
+[[package]]
+name = "posthog"
+version = "3.6.6"
+description = "Integrate PostHog into any python application."
+optional = false
+python-versions = "*"
+files = [
+    {file = "posthog-3.6.6-py2.py3-none-any.whl", hash = "sha256:38834fd7f0732582a20d4eb4674c8d5c088e464d14d1b3f8c176e389aecaa4ef"},
+    {file = "posthog-3.6.6.tar.gz", hash = "sha256:1e04783293117109189ad7048f3eedbe21caff0e39bee5e2d47a93dd790fefac"},
+]
+
+[package.dependencies]
+backoff = ">=1.10.0"
+monotonic = ">=1.5"
+python-dateutil = ">2.1"
+requests = ">=2.7,<3.0"
+six = ">=1.5"
+
+[package.extras]
+dev = ["black", "flake8", "flake8-print", "isort", "pre-commit"]
+sentry = ["django", "sentry-sdk"]
+test = ["coverage", "django", "flake8", "freezegun (==0.3.15)", "mock (>=2.0.0)", "pylint", "pytest", "pytest-timeout"]
 
 [[package]]
 name = "proto-plus"
@@ -2957,6 +3139,17 @@ files = [
 ]
 
 [[package]]
+name = "soupsieve"
+version = "2.6"
+description = "A modern CSS selector implementation for Beautiful Soup."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "soupsieve-2.6-py3-none-any.whl", hash = "sha256:e72c4ff06e4fb6e4b5a9f0f55fe6e81514581fca1515028625d0f299c602ccc9"},
+    {file = "soupsieve-2.6.tar.gz", hash = "sha256:e2e68417777af359ec65daac1057404a3c8a5455bb8abc36f1a9866ab1a51abb"},
+]
+
+[[package]]
 name = "sqlalchemy"
 version = "2.0.35"
 description = "Database Abstraction Library"
@@ -3077,6 +3270,20 @@ watchdog = {version = ">=2.1.5,<5", markers = "platform_system != \"Darwin\""}
 
 [package.extras]
 snowflake = ["snowflake-connector-python (>=2.8.0)", "snowflake-snowpark-python[modin] (>=1.17.0)"]
+
+[[package]]
+name = "streamlit-javascript"
+version = "0.1.5"
+description = "component to run javascript code in streamlit application"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "streamlit-javascript-0.1.5.tar.gz", hash = "sha256:9da5176522a0acf2c39d3b0bec9f856fdd8ea3c70bb1066841a546ab1348ae1d"},
+    {file = "streamlit_javascript-0.1.5-py3-none-any.whl", hash = "sha256:36ca4d8c46fd5b6526d1a705530472e03cb6e5bb24694330649f21d5c436d280"},
+]
+
+[package.dependencies]
+streamlit = ">=0.75"
 
 [[package]]
 name = "tabulate"
@@ -3580,4 +3787,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "94f22249a6d46e46ebecfbf7b6127d81b8991c87d21cb90cbda5aa4a6622176a"
+content-hash = "902d27c4b49c735ca7b910bcea04ca0068650a884fba3d757e48a457046be3d9"

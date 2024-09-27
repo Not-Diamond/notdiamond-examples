@@ -11,6 +11,15 @@ notdiamond = {extras = ["create"], version = "^0.3.14"}
 streamlit = "^1.38.0"
 python-dotenv = "^1.0.1"
 
+[tool.poetry.group.rag.dependencies]
+haystack-ai = "^2.3.0"
+langdetect = "^1.0.9"
+more-itertools = "^10.5.0"
+anthropic-haystack = "^1.0.0"
+posthog = "^3.6.5"
+requests = "^2.32.3"
+beautifulsoup4 = "^4.12.3"
+streamlit-javascript = "^0.1.5"
 
 [build-system]
 requires = ["poetry-core"]
