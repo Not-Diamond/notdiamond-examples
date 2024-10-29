@@ -58,8 +58,8 @@ ndLLMProviders = [
     {
         "ndProvider": "openai",
         "cloudProvider": "openai",
-        "ndModelId": "gpt-4o",
-        "providerModelId": "gpt-4o",
+        "ndModelId": "gpt-4o-2024-08-06",
+        "providerModelId": "gpt-4o-2024-08-06",
         "label": "GPT-4o",
         "inputCost": 5,
         "outputCost": 15,
@@ -68,8 +68,8 @@ ndLLMProviders = [
     {
         "ndProvider": "openai",
         "cloudProvider": "openai",
-        "ndModelId": "gpt-4o-mini",
-        "providerModelId": "gpt-4o-mini",
+        "ndModelId": "gpt-4o-mini-2024-07-18",
+        "providerModelId": "gpt-4o-mini-2024-07-18",
         "label": "GPT-4o Mini",
         "inputCost": 0.15,
         "outputCost": 0.6,
@@ -93,8 +93,8 @@ _LOGGER.setLevel(logging.INFO)
 _LOGGER.addHandler(logging.StreamHandler(sys.stdout))
 
 model_id_to_label = {
-    "gpt-4o-mini-2024-07-18": "gpt-4o-mini",
-    "gpt-4o-2024-05-13": "gpt-4o",
+    "gpt-4o-mini-2024-07-18": "gpt-4o-mini-2024-07-18",
+    "gpt-4o-2024-08-06": "gpt-4o-2024-08-06",
     "claude-3-5-sonnet-20240620": "anthropic.claude-3-5-sonnet-20240620-v1:0"
 }
 
@@ -309,8 +309,8 @@ def search(question: str, extra_repo: str = None, extra_website: str = None) -> 
     anthropic_answer_builder = AnswerBuilder()
 
     llm_configs = [
-        "openai/gpt-4o",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-2024-08-06",
+        "openai/gpt-4o-mini-2024-07-18",
         "anthropic/claude-3-5-sonnet-20240620",
         # "google/gemini-1.5-pro-latest",
     ]
@@ -319,8 +319,8 @@ def search(question: str, extra_repo: str = None, extra_website: str = None) -> 
 
     # google_generator = GoogleAIGeminiGenerator(model="gemini-1.5-pro")
     anthropic_generator = AnthropicGenerator(model="claude-3-5-sonnet-20240620")
-    gpt4o_generator = OpenAIGenerator(model="gpt-4o")
-    gpt4o_mini_generator = OpenAIGenerator(model="gpt-4o-mini")
+    gpt4o_generator = OpenAIGenerator(model="gpt-4o-2024-08-06")
+    gpt4o_mini_generator = OpenAIGenerator(model="gpt-4o-mini-2024-07-18")
 
     # Define the retriever component with filters
     retriever = InMemoryBM25Retriever(document_store=doc_store)
@@ -355,8 +355,8 @@ def search(question: str, extra_repo: str = None, extra_website: str = None) -> 
     query_pipeline.connect(
         "not_diamond_router.claude-3-5-sonnet-20240620", "anthropic_llm"
     )
-    query_pipeline.connect("not_diamond_router.gpt-4o", "gpt4o_llm")
-    query_pipeline.connect("not_diamond_router.gpt-4o-mini", "gpt4o_mini_llm")
+    query_pipeline.connect("not_diamond_router.gpt-4o-2024-08-06", "gpt4o_llm")
+    query_pipeline.connect("not_diamond_router.gpt-4o-mini-2024-07-18", "gpt4o_mini_llm")
 
     # query_pipeline.connect("google_llm.replies", "google_answer_builder.replies")
     query_pipeline.connect("anthropic_llm.replies", "anthropic_answer_builder.replies")
@@ -375,7 +375,7 @@ def search(question: str, extra_repo: str = None, extra_website: str = None) -> 
     messages = [question]
     output = res[builder_key]["answers"][0].data
     response_cost = get_cost(messages, output, res[llm_key]["meta"][0]["model"])
-    gpt4o_cost = get_cost(messages, output, "gpt-4o-2024-05-13")  # Use the mapped model ID
+    gpt4o_cost = get_cost(messages, output, "gpt-4o-2024-08-06")  # Use the mapped model ID
     savings = calculate_savings(response_cost, gpt4o_cost)
 
     return res[llm_key]["meta"][0]["model"], res[builder_key]["answers"][0], response_cost, savings
