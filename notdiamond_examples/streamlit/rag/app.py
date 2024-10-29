@@ -231,28 +231,22 @@ def fetch(documentations: List[Tuple[str, str, Any]]):
 
     return documents
 
+
+@st.cache_data
 def add_extra_website(extra_website: str, follow_links: bool, exclude_header_footer: bool, max_depth: int=1):
-    # Unique key based on website and parameters
-    data_key = f"{extra_website}_{follow_links}_{exclude_header_footer}"
+    filter = urlparse(extra_website).netloc or '.'.join(extra_website.split(".")[-2:])
+    print(f"Scraping website {extra_website} with filter {filter}")
 
-    if 'scraped_data' not in st.session_state:
-        st.session_state.scraped_data = {}
-
-    if data_key in st.session_state.scraped_data:
-        # Use cached scraped data
-        scraped_data = st.session_state.scraped_data[data_key]
-    else:
-        # Scrape the website and store the result
-        scraped_data = scrape_website(
-            extra_website,
-            urlparse(extra_website).netloc,
-            follow_links,
-            exclude_header_footer,
-            max_depth=max_depth,
-        )
-        st.session_state.scraped_data[data_key] = scraped_data
+    scraped_data = scrape_website(
+        extra_website,
+        filter,
+        follow_links,
+        exclude_header_footer,
+        max_depth=max_depth,
+    )
 
     return extra_website, scraped_data
+
 
 def document_store(index: str = "documentation"):
     if "doc_store" not in st.session_state:
