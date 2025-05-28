@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">3.10,<3.13"
 notdiamond = { extras = ["create"], version = "^0.4.2" }
+h11 = ">=0.16.0"
 streamlit = "^1.38.0"
 python-dotenv = "^1.0.1"
 
