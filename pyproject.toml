@@ -18,7 +18,7 @@ langdetect = "^1.0.9"
 more-itertools = "^10.5.0"
 anthropic-haystack = "^1.0.0"
 posthog = "^3.6.5"
-requests = "^2.32.3"
+requests = "^2.32.4"
 beautifulsoup4 = "^4.12.3"
 streamlit-javascript = "^0.1.5"
 
